@@ -3,8 +3,8 @@ package beacon
 import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/prysmaticlabs/go-bitfield"
-	ethpb "github.com/prysmaticlabs/prysm/v4/proto/eth/v1"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/connection/types"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/eth/v1"
 )
 
 // API request options

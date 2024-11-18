@@ -18,9 +18,9 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	gtypes "github.com/ethereum/go-ethereum/core/types"
-	ethpb "github.com/prysmaticlabs/prysm/v4/proto/eth/v1"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/connection/beacon"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/utils"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/eth/v1"
 )
 
 // Config

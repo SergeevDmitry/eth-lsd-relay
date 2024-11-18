@@ -9,12 +9,12 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/pkg/errors"
-	ethpb "github.com/prysmaticlabs/prysm/v4/proto/eth/v1"
 	"github.com/shopspring/decimal"
 	"github.com/sirupsen/logrus"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/connection/beacon"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/connection/types"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/utils"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/eth/v1"
 )
 
 func init() {

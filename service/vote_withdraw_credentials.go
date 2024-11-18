@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/prysmaticlabs/prysm/v4/contracts/deposit"
-	ethpb "github.com/prysmaticlabs/prysm/v4/proto/prysm/v1alpha1"
 	"github.com/samber/lo"
 	"github.com/sirupsen/logrus"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/connection/beacon"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/connection/types"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/utils"
+	"github.com/stratisproject/prysm-stratis/contracts/deposit"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 )
 
 func (s *Service) voteWithdrawCredentials() error {

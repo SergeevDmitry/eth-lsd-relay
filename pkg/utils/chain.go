@@ -3,7 +3,7 @@ package utils
 import (
 	"math"
 
-	"github.com/prysmaticlabs/prysm/v4/config/params"
+	"github.com/stratisproject/prysm-stratis/config/params"
 )
 
 // PulseChainConfig defines the config for the PulseChain beacon chain mainnet.

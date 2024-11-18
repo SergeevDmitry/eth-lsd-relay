@@ -9,14 +9,14 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/core/signing"
-	"github.com/prysmaticlabs/prysm/v4/config/params"
-	"github.com/prysmaticlabs/prysm/v4/contracts/deposit"
-	ethpb "github.com/prysmaticlabs/prysm/v4/proto/prysm/v1alpha1"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/connection/beacon"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/connection/beacon/client"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/connection/types"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/utils"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/core/signing"
+	"github.com/stratisproject/prysm-stratis/config/params"
+	"github.com/stratisproject/prysm-stratis/contracts/deposit"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 )
 
 var chainId = big.NewInt(17000)

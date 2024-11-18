@@ -69,10 +69,10 @@ func Load(basePath string) (*Config, error) {
 		cfg.TrustNodeDepositAmount = 1
 	}
 	if cfg.Eth2EffectiveBalance == 0 {
-		cfg.Eth2EffectiveBalance = 32
+		cfg.Eth2EffectiveBalance = 20000
 	}
 	if cfg.MaxPartialWithdrawalAmount == 0 {
-		cfg.MaxPartialWithdrawalAmount = 8
+		cfg.MaxPartialWithdrawalAmount = 5000
 	}
 	if cfg.GasLimit == "" {
 		cfg.GasLimit = "3000000"

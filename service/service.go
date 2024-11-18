@@ -20,8 +20,6 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	lru "github.com/hashicorp/golang-lru/v2"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/core/signing"
-	"github.com/prysmaticlabs/prysm/v4/config/params"
 	"github.com/shopspring/decimal"
 	"github.com/sirupsen/logrus"
 	deposit_contract "github.com/stafiprotocol/eth-lsd-relay/bindings/DepositContract"
@@ -40,6 +38,8 @@ import (
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/destorage/pinata"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/local_store"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/utils"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/core/signing"
+	"github.com/stratisproject/prysm-stratis/config/params"
 )
 
 type Service struct {
@@ -272,7 +272,7 @@ func (s *Service) Start() error {
 	}
 
 	switch chainId.Uint64() {
-	case 1: //mainnet
+	case 105105: // stratis
 		if !bytes.Equal(s.eth2Config.GenesisForkVersion, params.MainnetConfig().GenesisForkVersion) {
 			return fmt.Errorf("endpoint network not match")
 		}
@@ -287,70 +287,15 @@ func (s *Service) Start() error {
 		}
 		s.domain = domain
 
-	case 11155111: // sepolia
-		if !bytes.Equal(s.eth2Config.GenesisForkVersion, params.SepoliaConfig().GenesisForkVersion) {
+	case 205205: // auroria
+		if !bytes.Equal(s.eth2Config.GenesisForkVersion, params.AuroriaConfig().GenesisForkVersion) {
 			return fmt.Errorf("endpoint network not match")
 		}
 
 		domain, err := signing.ComputeDomain(
-			params.SepoliaConfig().DomainDeposit,
-			params.SepoliaConfig().GenesisForkVersion,
-			params.SepoliaConfig().ZeroHash[:],
-		)
-		if err != nil {
-			return err
-		}
-		s.domain = domain
-	case 17000: // holesky
-		chainCfg := params.HoleskyConfig()
-		if !bytes.Equal(s.eth2Config.GenesisForkVersion, chainCfg.GenesisForkVersion) {
-			return fmt.Errorf("endpoint network not match")
-		}
-		domain, err := signing.ComputeDomain(
-			chainCfg.DomainDeposit,
-			chainCfg.GenesisForkVersion,
-			chainCfg.ZeroHash[:],
-		)
-		if err != nil {
-			return err
-		}
-		s.domain = domain
-	case 5: // goerli
-		if !bytes.Equal(s.eth2Config.GenesisForkVersion, params.PraterConfig().GenesisForkVersion) {
-			return fmt.Errorf("endpoint network not match")
-		}
-		domain, err := signing.ComputeDomain(
-			params.PraterConfig().DomainDeposit,
-			params.PraterConfig().GenesisForkVersion,
-			params.PraterConfig().ZeroHash[:],
-		)
-		if err != nil {
-			return err
-		}
-		s.domain = domain
-	case 369: // pulse chain mainnet
-		chainConfig := utils.PulseChainConfig()
-		if !bytes.Equal(s.eth2Config.GenesisForkVersion, chainConfig.GenesisForkVersion) {
-			return fmt.Errorf("endpoint network not match")
-		}
-		domain, err := signing.ComputeDomain(
-			chainConfig.DomainDeposit,
-			chainConfig.GenesisForkVersion,
-			chainConfig.ZeroHash[:],
-		)
-		if err != nil {
-			return err
-		}
-		s.domain = domain
-	case 943: // pulse chain testnet
-		chainConfig := utils.PulseChainTestnetV4Config()
-		if !bytes.Equal(s.eth2Config.GenesisForkVersion, chainConfig.GenesisForkVersion) {
-			return fmt.Errorf("endpoint network not match")
-		}
-		domain, err := signing.ComputeDomain(
-			chainConfig.DomainDeposit,
-			chainConfig.GenesisForkVersion,
-			chainConfig.ZeroHash[:],
+			params.AuroriaConfig().DomainDeposit,
+			params.AuroriaConfig().GenesisForkVersion,
+			params.AuroriaConfig().ZeroHash[:],
 		)
 		if err != nil {
 			return err

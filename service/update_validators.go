@@ -15,11 +15,11 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/sirupsen/logrus"
 
-	ethpb "github.com/prysmaticlabs/prysm/v4/proto/eth/v1"
 	node_deposit "github.com/stafiprotocol/eth-lsd-relay/bindings/NodeDeposit"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/connection/beacon"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/connection/types"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/utils"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/eth/v1"
 )
 
 func (s *Service) updateValidatorsFromNetwork() error {
