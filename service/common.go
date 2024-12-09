@@ -17,7 +17,7 @@ import (
 	ethpb "github.com/stratisproject/prysm-stratis/proto/eth/v1"
 )
 
-var masterNodeAddress = common.HexToAddress("0x0000000000000000000000000000000000001002")
+var masterNodeAddress = "0x0000000000000000000000000000000000001002"
 
 func init() {
 	decimal.MarshalJSONWithoutQuotes = true
@@ -129,7 +129,7 @@ func (s *Service) getUserNodePlatformFromWithdrawals(latestDistributeHeight, tar
 				continue
 			}
 			// Skip withdrawals to MasterNode contract
-			if w.Address.Cmp(masterNodeAddress) == 0 {
+			if w.Address == masterNodeAddress {
 				continue
 			}
 
