@@ -232,6 +232,7 @@ func (m *ServiceManager) CacheBeaconBlock(blockId uint64) (*CachedBeaconBlock, b
 	}
 	for _, w := range block.Withdrawals {
 		cachedBlock.Withdrawals = append(cachedBlock.Withdrawals, &CachedWithdrawal{
+			Address:        w.Address,
 			ValidatorIndex: w.ValidatorIndex,
 			Amount:         w.Amount,
 		})

@@ -174,6 +174,7 @@ type CachedTransaction struct {
 }
 
 type CachedWithdrawal struct {
+	Address        common.Address
 	ValidatorIndex uint64
 	Amount         uint64
 }
