@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/shopspring/decimal"
 	"github.com/sirupsen/logrus"
@@ -72,7 +73,7 @@ func startRelayCmd() *cobra.Command {
 			ctx := utils.ShutdownListener()
 
 			// load voter account
-			kpI, err := keystore.KeypairFromAddress(cfg.Account, keystore.EthChain, cfg.KeystorePath, false)
+			kpI, err := keystore.KeypairFromAddress(strings.ToLower(cfg.Account), keystore.EthChain, cfg.KeystorePath, false)
 			if err != nil {
 				return err
 			}

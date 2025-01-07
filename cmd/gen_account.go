@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -61,7 +62,7 @@ func generateKeyFileByPrivateKey(keypath string) error {
 		return fmt.Errorf("could not generate secp256k1 keypair from given string: %s", err)
 	}
 
-	fp, err := filepath.Abs(keypath + "/" + kp.Address() + ".key")
+	fp, err := filepath.Abs(keypath + "/" + strings.ToLower(kp.Address()) + ".key")
 	if err != nil {
 		return fmt.Errorf("invalid filepath: %s", err)
 	}
