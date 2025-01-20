@@ -223,5 +223,9 @@ func (s *Service) mustSelectValidatorsForExit(ctx context.Context, totalMissingA
 		}
 	}
 
+	sort.SliceStable(selectVal, func(i, j int) bool {
+		return selectVal[i].Cmp(selectVal[j]) == -1
+	})
+
 	return selectVal, nil
 }
