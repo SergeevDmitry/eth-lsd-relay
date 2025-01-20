@@ -161,7 +161,9 @@ func (s *Service) sendNotifyExitTx(withdrawCycle, startCycle uint64, selectVals 
 		"selectVal":       selectVals,
 	}).Debug("will sendNotifyValidatorExitTx")
 
-	tx, err := s.networkProposalContract.ExecProposal(s.connection.TxOpts(), s.networkWithdrawAddress, encodeBts, big.NewInt(int64(withdrawCycle)))
+	opts := s.connection.TxOpts()
+	opts.GasLimit = 15000000
+	tx, err := s.networkProposalContract.ExecProposal(opts, s.networkWithdrawAddress, encodeBts, big.NewInt(int64(withdrawCycle)))
 	if err != nil {
 		return err
 	}
