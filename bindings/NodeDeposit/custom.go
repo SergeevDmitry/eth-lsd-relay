@@ -59,9 +59,11 @@ func (nodeDeposit *CustomNodeDeposit) GetPubkeysOfNodes(opts *bind.CallOpts, _no
 		)
 	}
 
-	_, err := nodeDeposit.multiCaller.Call(opts, calls...)
-	if err != nil {
-		return nil, err
+	for _, chunk := range lo.Chunk(calls, 2) {
+		_, err := nodeDeposit.multiCaller.Call(opts, chunk...)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return lo.Associate(calls, func(c *multicall.Call) (common.Address, pubkeyList) {
@@ -89,9 +91,11 @@ func (nodeDeposit *CustomNodeDeposit) GetPubkeyInfoList(opts *bind.CallOpts, pub
 		)
 	})
 
-	_, err := nodeDeposit.multiCaller.Call(opts, calls...)
-	if err != nil {
-		return nil, err
+	for _, chunk := range lo.Chunk(calls, 200) {
+		_, err := nodeDeposit.multiCaller.Call(opts, chunk...)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return lo.Associate(calls, func(c *multicall.Call) (string, *GetPubkeyInfoListOutput) {

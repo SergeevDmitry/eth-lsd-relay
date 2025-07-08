@@ -1,8 +1,8 @@
 module github.com/stafiprotocol/eth-lsd-relay
 
-go 1.21.4
+go 1.23.0
 
-toolchain go1.21.5
+toolchain go1.24.3
 
 require (
 	github.com/BurntSushi/toml v1.3.2
@@ -117,7 +117,7 @@ require (
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stafiprotocol/go-substrate-rpc-client v1.0.2 // indirect
-	github.com/supranational/blst v0.3.11 // indirect
+	github.com/supranational/blst v0.3.14 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20220721030215-126854af5e6d // indirect
 	github.com/thomaso-mirodin/intmath v0.0.0-20160323211736-5dc6d854e46e // indirect
 	github.com/tklauser/go-sysconf v0.3.13 // indirect

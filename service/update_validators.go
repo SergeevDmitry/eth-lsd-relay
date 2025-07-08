@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"sync"
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -14,6 +15,7 @@ import (
 	"github.com/samber/lo"
 	"github.com/shopspring/decimal"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/sync/errgroup"
 
 	node_deposit "github.com/stafiprotocol/eth-lsd-relay/bindings/NodeDeposit"
 	"github.com/stafiprotocol/eth-lsd-relay/pkg/connection/beacon"
@@ -262,75 +264,102 @@ func mapValidatorStatus(status *beacon.ValidatorStatus) (uint8, error) {
 }
 
 func (s *Service) fetchNewVals(call *bind.CallOpts, pubkeys [][]byte) (map[string]*Validator, error) {
-	newVals := make(map[string]*Validator)
+	// Check duplicates
 	for _, pubkey := range pubkeys {
 		key := hex.EncodeToString(pubkey)
 		if _, exist := s.validators[key]; exist {
 			return nil, fmt.Errorf("validator %s duplicate", key)
 		}
+	}
 
-		pubkeyInfo, err := s.nodeDepositContract.PubkeyInfoOf(call, pubkey)
-		if err != nil {
-			return nil, err
-		}
+	pubkeyInfo, err := s.nodeDepositContract.GetPubkeyInfoList(call, pubkeys)
+	if err != nil {
+		return nil, err
+	}
 
-		nodeLocal, exist := s.nodes[pubkeyInfo.Owner]
-		if !exist {
-			nodeInfo, err := s.nodeDepositContract.NodeInfoOf(call, pubkeyInfo.Owner)
+	g := new(errgroup.Group)
+	g.SetLimit(len(pubkeyInfo))
+	mux := &sync.RWMutex{}
+
+	newVals := make(map[string]*Validator)
+	for pubkeyStr, info := range pubkeyInfo {
+		pubkeyStr := pubkeyStr
+		info := info
+
+		g.Go(func() error {
+			mux.Lock()
+			nodeLocal, exist := s.nodes[info.Owner]
+			if !exist {
+				nodeInfo, err := s.nodeDepositContract.NodeInfoOf(call, info.Owner)
+				if err != nil {
+					return err
+				}
+
+				node := Node{
+					NodeAddress: info.Owner,
+					NodeType:    nodeInfo.NodeType,
+				}
+
+				s.nodes[node.NodeAddress] = &node
+
+				nodeLocal = &node
+			}
+			mux.Unlock()
+
+			filterBlock := info.DepositBlock.Uint64()
+			depositedIter, err := s.nodeDepositContract.FilterDeposited(&bind.FilterOpts{
+				Start:   filterBlock,
+				End:     &filterBlock,
+				Context: context.Background(),
+			})
 			if err != nil {
-				return nil, err
+				return err
 			}
 
-			node := Node{
-				NodeAddress: pubkeyInfo.Owner,
-				NodeType:    nodeInfo.NodeType,
+			pubkey, err := hex.DecodeString(pubkeyStr)
+			if err != nil {
+				return fmt.Errorf("failed to decode pubkey: %v", err)
 			}
 
-			s.nodes[node.NodeAddress] = &node
+			var depositSig []byte
+			for depositedIter.Next() {
+				if bytes.Equal(depositedIter.Event.Pubkey, pubkey) {
+					depositSig = depositedIter.Event.ValidatorSignature
+					break
+				}
+			}
 
-			nodeLocal = &node
-		}
+			if len(depositSig) == 0 {
+				return fmt.Errorf("depositSignature empty, val pubkey: %s", pubkeyStr)
+			}
 
-		filterBlock := pubkeyInfo.DepositBlock.Uint64()
-		depositedIter, err := s.nodeDepositContract.FilterDeposited(&bind.FilterOpts{
-			Start:   filterBlock,
-			End:     &filterBlock,
-			Context: context.Background(),
+			val := Validator{
+				Pubkey:                pubkey,
+				NodeAddress:           info.Owner,
+				DepositSignature:      depositSig,
+				NodeDepositAmountDeci: decimal.NewFromBigInt(info.NodeDepositAmount, 0),
+				NodeDepositAmount:     new(big.Int).Div(info.NodeDepositAmount, big.NewInt(1e9)).Uint64(), // convert wei to Gwei
+				DepositBlock:          info.DepositBlock.Uint64(),
+				ActiveEpoch:           0,
+				EligibleEpoch:         0,
+				ExitEpoch:             0,
+				WithdrawableEpoch:     0,
+				Balance:               0,
+				EffectiveBalance:      0,
+				NodeType:              nodeLocal.NodeType,
+				Status:                info.Status,
+				ValidatorIndex:        0,
+			}
+			mux.Lock()
+			newVals[pubkeyStr] = &val
+			mux.Unlock()
+
+			return nil
 		})
-		if err != nil {
-			return nil, err
-		}
+	}
 
-		var depositSig []byte
-		for depositedIter.Next() {
-			if bytes.Equal(depositedIter.Event.Pubkey, pubkey) {
-				depositSig = depositedIter.Event.ValidatorSignature
-				break
-			}
-		}
-
-		if len(depositSig) == 0 {
-			return nil, fmt.Errorf("depositSignature empty, val pubkey: %s", key)
-		}
-
-		val := Validator{
-			Pubkey:                pubkey,
-			NodeAddress:           pubkeyInfo.Owner,
-			DepositSignature:      depositSig,
-			NodeDepositAmountDeci: decimal.NewFromBigInt(pubkeyInfo.NodeDepositAmount, 0),
-			NodeDepositAmount:     new(big.Int).Div(pubkeyInfo.NodeDepositAmount, big.NewInt(1e9)).Uint64(), // convert wei to Gwei
-			DepositBlock:          pubkeyInfo.DepositBlock.Uint64(),
-			ActiveEpoch:           0,
-			EligibleEpoch:         0,
-			ExitEpoch:             0,
-			WithdrawableEpoch:     0,
-			Balance:               0,
-			EffectiveBalance:      0,
-			NodeType:              nodeLocal.NodeType,
-			Status:                pubkeyInfo.Status,
-			ValidatorIndex:        0,
-		}
-		newVals[key] = &val
+	if err := g.Wait(); err != nil {
+		return nil, err
 	}
 
 	if len(pubkeys) != len(newVals) {
